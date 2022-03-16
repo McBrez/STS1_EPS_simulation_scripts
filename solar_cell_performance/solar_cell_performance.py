@@ -185,7 +185,7 @@ def main(out_file: str):
 
     # Construct the plot
     fig, ax = plt.subplots()
-    im = ax.imshow(power.T)
+    im = ax.imshow(np.flip(power.T, axis=0))
     im.set_extent((-179, 179, -89, 89))
     ax.set_xlabel("Azimuth (°)")
     ax.set_ylabel("Elevation (°)")
