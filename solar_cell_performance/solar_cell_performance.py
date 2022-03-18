@@ -74,18 +74,36 @@ def get_rotation_matrix_azimuth(angle):
 
 def get_rotation_matrix_roll(angle):
     """
-    Rotates the object around the roll axis (x-axis) by the given angle.
-    :param object: The object that shall be rotated.
-    :param angle: The angle in radian.
-    :return: A rotated object.
+    Creates a 3x3 rotation matrix that corresponds to a rotation around the x axis.
+    :param angle: The angle in radian. If scalar, a 3x3 rotation matrix is returned. If angle is given as list, a stack
+    of 3x3 matrices is returned.
+    :return: The rotation matrix.
     """
-    # @formatter:off
-    return np.array(
-        [[1,        0,                  0                   ],
-         [0,        np.cos(angle),      -1 * np.sin(angle)  ],
-         [0,        np.sin(angle),      np.cos(angle)       ]],
-        dtype=np.double).T
-    # @formatter:on
+    is_iterable = False
+    try:
+        iter(angle)
+        is_iterable = True
+    except TypeError:
+        is_iterable = False
+
+    if is_iterable:
+        return np.fromiter(
+            [
+                # @formatter:off
+                1
+                # @formatter:on
+                for angle_value in angle],
+            dtype=np.double,
+            count=len(angle)
+        )
+    else:
+        # @formatter:off
+        return np.array(
+            [[1,        0,                  0                   ],
+            [0,        np.cos(angle),      -1 * np.sin(angle)  ],
+            [0,        np.sin(angle),      np.cos(angle)       ]],
+            dtype=np.double).T
+        # @formatter:on
 
 
 def get_rotation_matrix_elevation(angle):
@@ -115,7 +133,8 @@ def get_projected_area(area_matrix, azimuth, elevation, roll=0.0):
     :return: The projected area.
     """
 
-    # The vector that points to the sun. Unrotated (i.e. elevation and azimuth is zero ) it points into X+ direction.
+    # The vector that points to the sun. Unrotated (i.e. elevation and azimuth is zero ), it always points into X+
+    # direction.
     sun_vector = np.array([1.0, 0, 0])
 
     # Rotate the sun vector.
